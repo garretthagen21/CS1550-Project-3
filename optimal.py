@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 
 from algorithms.pagingalgorithm import *
 
@@ -12,10 +11,10 @@ class PageNode(object):
 
 
 
-class SecondChanceAlgorithm(PagingAlgorithm):
+class OptimalAlgorithm(PagingAlgorithm):
 
     def __init__(self, numFrames):
-        PagingAlgorithm.__init__("SecondChance", numFrames)
+        PagingAlgorithm.__init__("Optimal", numFrames)
         self.head = None
         self.tail = None
         self.size = 0
