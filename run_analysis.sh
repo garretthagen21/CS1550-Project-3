@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "**************** Starting Analysis **********************"
+
+
 # declare variables
 OUTPUT_DIR=csvfiles
 TRACE_DIR=traces
@@ -13,7 +16,7 @@ fi
 # Our parameters
 frame_counts=( 8 16 32 64 )
 algorithms=( lru second opt )
-trace_files=( gzip swim gcc )
+trace_files=( gzip swim gcc mcf twolf )
 
 # Iterate through files
 for file in "${trace_files[@]}"
@@ -24,9 +27,20 @@ do
 	    for algo in "${algorithms[@]}"
         do
             # Run for gzip.trace
-            ./vmsim.py -n $count -a $algo -d 1 -c $OUTPUT_DIR/$file.csv $TRACE_DIR/$file.trace
+            ./vmsim.py -n $count -a $algo -d 1 -c $OUTPUT_DIR/$file_all.csv $TRACE_DIR/$file.trace
         done
     done
 done
 
-echo "**************** Done With Analysis **********************"
+echo "**************** Done With All Algorithm Analysis **********************"
+
+
+for file in "${trace_files[@]}"
+    do
+    for ((i=2;i<=200;i+=5)); do
+        ./vmsim.py -n $i -a opt -d 1 -c $OUTPUT_DIR/$file_opt.csv $TRACE_DIR/$file.trace
+    done
+done
+
+
+echo "**************** Done With Opt Analysis **********************"
