@@ -2,29 +2,13 @@
 from pagingalgorithm import *
 
 
-class PageNode(object):
-    def __init__(self, address, refBit = False ,dirtyBit = False, prev=None, next=None):
-        self.address = address
-        self.refBit = refBit
-        self.dirtyBit = dirtyBit
-        self.prev = prev
-        self.next = next
-
-
-
 class SecondChanceAlgorithm(PagingAlgorithm):
 
     def __init__(self, numFrames, name="SECOND"):
         super().__init__(numFrames, name)
-        self.head = None
-        self.tail = None
-        self.lookupTable = {}
 
-        # Public method
 
     def access(self, address, mode):
-
-
 
         # Attempt to find the page in memory
         pageNode = dictLookup(self.lookupTable,address)
@@ -81,72 +65,5 @@ class SecondChanceAlgorithm(PagingAlgorithm):
         self.numAccesses += 1
 
 
-    # private method to remove page node
-    def remove(self, pageNode):
-
-        # Connect prev pointer to next pointer
-        if pageNode.prev:
-            pageNode.prev.next = pageNode.next
-
-        # Connect next pointer to prev pointer
-        if pageNode.next:
-            pageNode.next.prev = pageNode.prev
-
-        # If this was the head move it
-        if pageNode is self.head:
-            self.head = pageNode.next
-
-        # If this was the tail move it
-        if pageNode is self.tail:
-            self.tail = pageNode.prev
-
-        # Remove entry from hashmap
-        del self.lookupTable[pageNode.address]
-
-        # private method to append page node
-
-    def append(self, pageNode):
-
-        # Append to end
-        currTail = self.tail
-        pageNode.prev = currTail
-        if currTail:
-            currTail.next = pageNode
-
-        # New tail is page node
-        self.tail = pageNode
-        self.tail.next = None
-
-        # If this is also the first node we need to set the head
-        if not self.head:
-            self.head = self.tail
-
-        # Add entry to hashmap lookuptable
-        self.lookupTable[pageNode.address] = pageNode
-
-    def isFull(self):
-        return len(self.lookupTable) >= self.numFrames
-
-    def displayPageTable(self):
-        currNode = self.head
-        print("****** Access Num: " + str(self.numAccesses) + " **************")
-        print("Linked List: ")
-
-        for i in range(self.numFrames):
-            if currNode:
-                addr = str(currNode.address)
-                bit = str(currNode.refBit)
-                currNode = currNode.next
-                print("| " + str(i) + " | " + addr + " | " + bit + " |")
-            else:
-                print("| " + str(i) + " | XXXXXXX | X |")
-
-        print("Lookup Table:")
-        i = 0
-        for key, value in self.lookupTable.items():
-            print("| " + str(i) + " -> " + str(key) + " | " + str(value.refBit) + " |")
-            i += 1
-
-        print("\n")
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-
+import time
 import argparse
 import sys
 from lru import LRUAlgorithm
@@ -26,7 +26,9 @@ class MemoryAccess(object):
 
 
 class VirtualSimulator(object):
-    def __init__(self, traceFile, numFrames, algorithmType):
+    def __init__(self, traceFile, numFrames, algorithmType,outputFile):
+        # For csv
+        self.outputFile = outputFile
 
         # Initialize our trace sequence
         self.memorySequence = []
@@ -41,7 +43,8 @@ class VirtualSimulator(object):
 
         # Create paging algorithm
         if algorithmType == "opt":
-            self.pagingAlgorithm = OptimalAlgorithm(numFrames,"OPTIMAL", self.memorySequence)
+            self.pagingAlgorithm = OptimalAlgorithm(numFrames)
+            self.pagingAlgorithm.setInstructions(self.memorySequence)
         elif algorithmType == "lru":
             self.pagingAlgorithm = LRUAlgorithm(numFrames)
         elif algorithmType == "second":
@@ -51,17 +54,27 @@ class VirtualSimulator(object):
 
 
 
-    def run(self):
+    def run(self,debug = 0):
+        # Record execution time
+        startTime = time.time()
+
         # Execute the memory trace
         for memAccess in self.memorySequence:
             self.pagingAlgorithm.access(memAccess.address,memAccess.mode)
-            #self.pagingAlgorithm.displayPageTable()
+            if debug > 1:
+                self.pagingAlgorithm.printSummary()
 
         # Print our summary
         self.pagingAlgorithm.printSummary()
 
         # Write our csv so we can print graphs
-        self.pagingAlgorithm.writeCSV("test_results.csv")
+        self.pagingAlgorithm.writeCSV(self.outputFile)
+
+        if debug > 0:
+            hours, rem = divmod(time.time() - startTime, 3600)
+            minutes, seconds = divmod(rem, 60)
+            print("\nProgram Finished In Time {:0>2}:{:0>2}:{:05.2f} ".format(int(hours), int(minutes), seconds))
+
 
 
 
@@ -77,10 +90,16 @@ if __name__ == "__main__":
     parser.add_argument('-a', '--algorithm', dest='algorithm', action='store',
                         default='opt', type=str,
                         help='The type of algorithm to run. Options: <opt|lru|second>')
+    parser.add_argument('-c', '--csvfile', dest='csvfile', action='store',
+                        default='output.csv', type=str,
+                        help='Where to write/append the statistic results')
+    parser.add_argument('-d', '--debug', dest='debug', action='store',
+                        default=0, type=int,
+                        help='Where to write/append the statistic results')
 
     # Parse the arguments
     args = parser.parse_args()
 
     # Create and run simulator
-    virtualSim = VirtualSimulator(args.tracefile, int(args.num_frames), args.algorithm)
-    virtualSim.run()
+    virtualSim = VirtualSimulator(args.tracefile, int(args.num_frames), args.algorithm, args.csvfile)
+    virtualSim.run(args.debug)
