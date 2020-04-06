@@ -1,11 +1,11 @@
 #!/bin/sh
-if [ -d submission]
-then rm -rf submission
+if [ -d submission ]
+then rm -r submission
 fi
 
 mkdir submission
 
-cp vsim.py submission/vsim
-cp -r algorithms submission/algorithms
+cp *.py submission/
+mv submission/vmsim.py submission/vmsim
 
-gzip GBH8-CS1550-Project-3.zip submission/
+

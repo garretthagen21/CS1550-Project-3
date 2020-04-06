@@ -14,7 +14,7 @@ class PagingAlgorithm(object):
         print("Number of frames: "+str(self.numFrames))
         print("Total memory accesses: "+str(self.numAccesses))
         print("Total page faults: "+str(self.numPageFaults))
-        print("Total writes to disks: "+str(self.numDiskWrites))
+        print("Total writes to disk: "+str(self.numDiskWrites))
 
     def writeCSV(self,csvFile):
         pass
@@ -32,4 +32,3 @@ def parseAddressString(rawAddress):
     addrPortion = hexData[0:-3]
     offsetPortion = rawAddress[-3:]
     return addrPortion,offsetPortion
-    #return int(addrPortion, 16),int(offsetPortion,16)

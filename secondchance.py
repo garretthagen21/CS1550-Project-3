@@ -1,10 +1,11 @@
 
-from algorithms.pagingalgorithm import *
+from pagingalgorithm import *
 
 
 class PageNode(object):
-    def __init__(self, address, dirtyBit=0, prev=None, next=None):
+    def __init__(self, address, refBit = False ,dirtyBit = False, prev=None, next=None):
         self.address = address
+        self.refBit = refBit
         self.dirtyBit = dirtyBit
         self.prev = prev
         self.next = next
@@ -13,54 +14,79 @@ class PageNode(object):
 
 class SecondChanceAlgorithm(PagingAlgorithm):
 
-    def __init__(self, numFrames):
-        PagingAlgorithm.__init__("SecondChance", numFrames)
+    def __init__(self, numFrames, name="SECOND"):
+        super().__init__(numFrames, name)
         self.head = None
         self.tail = None
-        self.size = 0
         self.lookupTable = {}
 
-    # Override public method
-    def load(self, address):
+        # Public method
 
-        # Call super method
-        super()
+    def access(self, address, mode):
+
+        # Increment accesses
+        self.numAccesses += 1
 
         # Attempt to find the page in memory
-        pageNode = self.lookupTable[address]
+        pageNode = self.lookup(address)
 
         # Page does not exist so we need to load it
         if pageNode is None:
+
             # Increment page faults
-            self.numPageFaults+=1
+            self.numPageFaults += 1
 
             # Create new page entry
             pageNode = PageNode(address)
 
-            # Our page table is full so we need to evict
+            # If we are full, find a new spot via eviction
             if self.isFull():
 
-                # Evict front node if it exists
-                tempHead = self.head
-                self.remove(tempHead)
+                # Iterate through our nodes to find who to remove
+                currNode = self.head
+                while True:
 
-                # Write to disk if dirty bit is 1
-                if tempHead.dirtyBit == 1:
-                    self.numDiskWrites += 1
+                    # If the r bit is 1, set it to zero and send it to the back
+                    if currNode.refBit:
+                        currNode.refBit = False
+                        self.remove(currNode)
+                        self.append(currNode)
+                    else:
+                        # Write to disk if dirty bit is 1
+                        if currNode.dirtyBit:
+                            self.numDiskWrites += 1
+                        # Evict this node
+                        self.remove(currNode)
 
-        # The node already exists so remove it
+                        # Break from the loop
+                        break;
+
+                    # If we reached the end, go back to the beginning (simualte, doubly link list)
+                    if currNode is self.tail:
+                        currNode = self.head
+                    else:
+                        currNode = currNode.next
+
+            # Insert our new page at the back
+            self.append(pageNode)
+
+        # The page already exists in memory so set the reference bit to 1
         else:
-            self.remove(pageNode)
+            pageNode.refBit = True
 
-        # Regardless we will insert the pageNode to the back
-        self.append(pageNode)
+        # Only difference between store and load is what we do to the dirty bit
+        if mode == "s":
+            pageNode.dirtyBit = True
 
-
-
-
+    # Private lookup of page
+    def lookup(self, address):
+        try:
+            return self.lookupTable[address]
+        except KeyError:
+            return None
 
     # private method to remove page node
-    def remove(self,pageNode):
+    def remove(self, pageNode):
 
         # Connect prev pointer to next pointer
         if pageNode.prev:
@@ -81,10 +107,9 @@ class SecondChanceAlgorithm(PagingAlgorithm):
         # Remove entry from hashmap
         del self.lookupTable[pageNode.address]
 
+        # private method to append page node
 
-
-    # private method to append page node
-    def append(self,pageNode):
+    def append(self, pageNode):
 
         # Append to end
         currTail = self.tail
@@ -105,5 +130,27 @@ class SecondChanceAlgorithm(PagingAlgorithm):
 
     def isFull(self):
         return len(self.lookupTable) >= self.numFrames
+
+    def displayPageTable(self):
+        currNode = self.head
+        print("****** Access Num: " + str(self.numAccesses) + " **************")
+        print("Linked List: ")
+
+        for i in range(self.numFrames):
+            if currNode:
+                addr = str(currNode.address)
+                bit = str(currNode.refBit)
+                currNode = currNode.next
+                print("| " + str(i) + " | " + addr + " | " + bit + " |")
+            else:
+                print("| " + str(i) + " | XXXXXXX | X |")
+
+        print("Lookup Table:")
+        i = 0
+        for key, value in self.lookupTable.items():
+            print("| " + str(i) + " -> " + str(key) + " | " + str(value.refBit) + " |")
+            i += 1
+
+        print("\n")
 
 

@@ -1,11 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
+
 
 import argparse
 import sys
-from algorithms.pagingalgorithm import parseAddressString
-from algorithms.lru import LRUAlgorithm
-from algorithms.optimal import OptimalAlgorithm
-from algorithms.secondchance import SecondChanceAlgorithm
+from lru import LRUAlgorithm
+from optimal import OptimalAlgorithm
+from secondchance import SecondChanceAlgorithm
+from pagingalgorithm import parseAddressString
+
 
 
 def showErrorAndExit(errorReason,errorCode = 1):
@@ -66,11 +68,6 @@ class VirtualSimulator(object):
         self.pagingAlgorithm.writeCSV("test_results.csv")
 
 
-
-
-
-
-# ./vmsim –n <numframes> -a <opt|lru|second> <tracefile>
 
 if __name__ == "__main__":
 

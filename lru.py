@@ -1,5 +1,5 @@
 
-from algorithms.pagingalgorithm import *
+from pagingalgorithm import *
 
 
 class PageNode(object):
