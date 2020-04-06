@@ -1,7 +1,9 @@
 #!/bin/bash
 
-echo "**************** Starting Analysis **********************"
+# For fun
+START_TIME=date
 
+echo "**************** Starting Analysis **********************"
 
 # declare variables
 OUTPUT_DIR=csvfiles
@@ -19,28 +21,35 @@ algorithms=( lru second opt )
 trace_files=( gzip swim gcc mcf twolf )
 
 # Iterate through files
+#for file in "${trace_files[@]}"
+#do
+#	 for algo in "${algorithms[@]}"
+#     do
+#        for count in "${frame_counts[@]}"
+#        do
+#            ./vmsim.py -n $count -a $algo -d 1 -c "$OUTPUT_DIR/$file-basic.csv" $TRACE_DIR/$file.trace
+#        done
+#    done
+#done
+
+#echo "**************** Done With All Algorithm Analysis **********************"
+
+
 for file in "${trace_files[@]}"
 do
-	for count in "${frame_counts[@]}"
+    for algo in "${algorithms[@]}"
     do
-
-	    for algo in "${algorithms[@]}"
+        for ((i=2;i<=200;i+=2));
         do
-            # Run for gzip.trace
-            ./vmsim.py -n $count -a $algo -d 1 -c $OUTPUT_DIR/$file_all.csv $TRACE_DIR/$file.trace
+            ./vmsim.py -n $i -a $algo -d 1 -c "$OUTPUT_DIR/$file-extensive.csv" "$TRACE_DIR/$file.trace"
         done
     done
 done
 
-echo "**************** Done With All Algorithm Analysis **********************"
 
+echo "**************** Done With Extensive Analysis **********************"
 
-for file in "${trace_files[@]}"
-    do
-    for ((i=2;i<=200;i+=5)); do
-        ./vmsim.py -n $i -a opt -d 1 -c $OUTPUT_DIR/$file_opt.csv $TRACE_DIR/$file.trace
-    done
-done
+END_TIME=date
+ELAPSED_TIME=$END_TIME-$START_TIME
 
-
-echo "**************** Done With Opt Analysis **********************"
+echo " Process took total time of $ELAPSED_TIME seconds "

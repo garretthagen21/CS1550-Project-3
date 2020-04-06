@@ -66,7 +66,9 @@ class OptimalAlgorithm(PagingAlgorithm):
         removalNode = currNode
 
         while currNode is not None:
-            lineDiff = self.findNextAccessDistance(self.instructionSet[currNode.address], self.numAccesses)
+
+            # Find the distance to the next instruction, and filter out instructions weve already seen
+            lineDiff, self.instructionSet[currNode.address] = self.findNextAccessDistance(self.instructionSet[currNode.address], self.numAccesses)
 
             # If the line diff is negative, we should stop now, because it wont show up again and is our lru
             if lineDiff < 0:
@@ -83,14 +85,20 @@ class OptimalAlgorithm(PagingAlgorithm):
 
         return removalNode
 
+    # This function will return the distance to the closest next instruction
+    # And remove all previous instructions, to optimize run time
     def findNextAccessDistance(self, lineNums, thresh):
 
-        # If we are past the maximum instruction, just return (slight optimization)
-        maxLine = lineNums[-1]
+        # If the list is empty set to -1 else set to actual max
+        maxLine = lineNums[-1] if lineNums else -1
+
+        # If we are past the maximum instruction, return negative
         if maxLine <= thresh:
-            return maxLine - thresh
+            return (-1, [])
 
         # Get the distance between the next instruction and the current one
-        for num in lineNums:
+        for index in range(len(lineNums)):
+            num = lineNums[index]
             if num > thresh:
-                return num - thresh
+                return (num - thresh, lineNums[index:])
+

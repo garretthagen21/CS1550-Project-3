@@ -27,6 +27,7 @@ class MemoryAccess(object):
 
 class VirtualSimulator(object):
     def __init__(self, traceFile, numFrames, algorithmType,outputFile):
+
         # For csv
         self.outputFile = outputFile
 
@@ -60,20 +61,23 @@ class VirtualSimulator(object):
 
         # Execute the memory trace
         for memAccess in self.memorySequence:
-            self.pagingAlgorithm.access(memAccess.address,memAccess.mode)
+            self.pagingAlgorithm.access(memAccess.address, memAccess.mode)
             if debug > 1:
                 self.pagingAlgorithm.printSummary()
 
         # Print our summary
         self.pagingAlgorithm.printSummary()
 
-        # Write our csv so we can print graphs
-        self.pagingAlgorithm.writeCSV(self.outputFile)
+
 
         if debug > 0:
+            # Write our csv so we can print graphs
+            self.pagingAlgorithm.writeCSV(self.outputFile)
+
+            # Write our execution time
             hours, rem = divmod(time.time() - startTime, 3600)
             minutes, seconds = divmod(rem, 60)
-            print("\nProgram Finished In Time {:0>2}:{:0>2}:{:05.2f} ".format(int(hours), int(minutes), seconds))
+            print("Program Finished In Time {:0>2}:{:0>2}:{:05.2f}\n".format(int(hours), int(minutes), seconds))
 
 
 
