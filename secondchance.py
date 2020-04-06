@@ -24,11 +24,10 @@ class SecondChanceAlgorithm(PagingAlgorithm):
 
     def access(self, address, mode):
 
-        # Increment accesses
-        self.numAccesses += 1
+
 
         # Attempt to find the page in memory
-        pageNode = self.lookup(address)
+        pageNode = dictLookup(self.lookupTable,address)
 
         # Page does not exist so we need to load it
         if pageNode is None:
@@ -78,12 +77,9 @@ class SecondChanceAlgorithm(PagingAlgorithm):
         if mode == "s":
             pageNode.dirtyBit = True
 
-    # Private lookup of page
-    def lookup(self, address):
-        try:
-            return self.lookupTable[address]
-        except KeyError:
-            return None
+        # Increment accesses
+        self.numAccesses += 1
+
 
     # private method to remove page node
     def remove(self, pageNode):

@@ -9,6 +9,7 @@ class PagingAlgorithm(object):
         self.numAccesses = 0
 
 
+
     def printSummary(self):
         print("Algorithm: "+str(self.algoName))
         print("Number of frames: "+str(self.numFrames))
@@ -32,3 +33,10 @@ def parseAddressString(rawAddress):
     addrPortion = hexData[0:-3]
     offsetPortion = rawAddress[-3:]
     return addrPortion,offsetPortion
+
+ # Convenience dict lookup
+def dictLookup(dict,key):
+    try:
+        return dict[key]
+    except KeyError:
+        return None

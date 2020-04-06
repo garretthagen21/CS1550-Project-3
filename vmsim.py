@@ -16,19 +16,13 @@ def showErrorAndExit(errorReason,errorCode = 1):
 
 
 class MemoryAccess(object):
-    def __init__(self,mode,rawAddr):
+    def __init__(self,mode,rawAddr,lineNum):
         self.mode = mode
+        self.lineNum = lineNum
         addrTuple = parseAddressString(rawAddr)
         self.address = addrTuple[0]
         self.offset = addrTuple[1]
 
-    def execute(self,pagingAlgorithm):
-        if self.mode == 'l':
-            pagingAlgorithm.load(self.address)
-        elif self.mode == 's':
-            pagingAlgorithm.store(self.address)
-        else:
-            showErrorAndExit("Invalid mode: " + str(self.mode) + " for address: " + self.address)
 
 
 class VirtualSimulator(object):
@@ -37,15 +31,17 @@ class VirtualSimulator(object):
         # Initialize our trace sequence
         self.memorySequence = []
         tFile = open(traceFile, 'r')
+        lineNum = 0
         for line in tFile.readlines():
             lineTokens = line.split()
-            memoryAccess = MemoryAccess(lineTokens[0],lineTokens[1])
+            memoryAccess = MemoryAccess(lineTokens[0],lineTokens[1],lineNum)
             self.memorySequence.append(memoryAccess)
+            lineNum+=1
         tFile.close()
 
         # Create paging algorithm
         if algorithmType == "opt":
-            self.pagingAlgorithm = OptimalAlgorithm(numFrames)
+            self.pagingAlgorithm = OptimalAlgorithm(numFrames,"OPTIMAL", self.memorySequence)
         elif algorithmType == "lru":
             self.pagingAlgorithm = LRUAlgorithm(numFrames)
         elif algorithmType == "second":

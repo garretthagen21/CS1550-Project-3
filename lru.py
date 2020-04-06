@@ -3,7 +3,7 @@ from pagingalgorithm import *
 
 
 class PageNode(object):
-    def __init__(self, address, dirtyBit = 0, prev = None, next = None):
+    def __init__(self, address, dirtyBit = False, prev = None, next = None):
         self.address = address
         self.dirtyBit = dirtyBit
         self.prev = prev
@@ -22,11 +22,8 @@ class LRUAlgorithm(PagingAlgorithm):
     # Public method
     def access(self, address, mode):
 
-        # Increment accesses
-        self.numAccesses += 1
-
         # Attempt to find the page in memory
-        pageNode = self.lookup(address)
+        pageNode = dictLookup(self.lookupTable,address)
 
         # Page does not exist so we need to load it
         if pageNode is None:
@@ -41,7 +38,7 @@ class LRUAlgorithm(PagingAlgorithm):
             if self.isFull():
 
                 # Write to disk if dirty bit is 1
-                if self.head.dirtyBit == 1:
+                if self.head.dirtyBit:
                     self.numDiskWrites += 1
 
                 # Evict front node if it exists
@@ -56,15 +53,10 @@ class LRUAlgorithm(PagingAlgorithm):
 
         # Only difference between store and load is what we do to the dirty bit
         if mode == "s":
-            pageNode.dirtyBit = 1
+            pageNode.dirtyBit = True
 
-
-    # Private lookup of page
-    def lookup(self, address):
-        try:
-            return self.lookupTable[address]
-        except KeyError:
-            return None
+        # Increment accesses
+        self.numAccesses += 1
 
 
 
