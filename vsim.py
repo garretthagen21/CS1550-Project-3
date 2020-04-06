@@ -1,10 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 import argparse
 import sys
-from .lru import *
-from .optimal import *
-from .secondchange import *
+from algorithms.pagingalgorithm import parseAddressString
+from algorithms.lru import LRUAlgorithm
+from algorithms.optimal import OptimalAlgorithm
+from algorithms.secondchance import SecondChanceAlgorithm
+
 
 def showErrorAndExit(errorReason,errorCode = 1):
     print("[Error] "+errorReason+" Exiting program...\n")
@@ -12,9 +14,11 @@ def showErrorAndExit(errorReason,errorCode = 1):
 
 
 class MemoryAccess(object):
-    def __init__(self,mode,address):
+    def __init__(self,mode,rawAddr):
         self.mode = mode
-        self.address = address
+        addrTuple = parseAddressString(rawAddr)
+        self.address = addrTuple[0]
+        self.offset = addrTuple[1]
 
     def execute(self,pagingAlgorithm):
         if self.mode == 'l':
@@ -24,13 +28,6 @@ class MemoryAccess(object):
         else:
             showErrorAndExit("Invalid mode: " + str(self.mode) + " for address: " + self.address)
 
-
-    # TODO: Get first 20 bits of address
-    def parseAddress(self):
-        pass
-    # TODO: Get last 12 bits of address
-    def parseOffset(self):
-        pass
 
 class VirtualSimulator(object):
     def __init__(self, traceFile, numFrames, algorithmType):
@@ -58,16 +55,15 @@ class VirtualSimulator(object):
 
     def run(self):
         # Execute the memory trace
-        for access in self.memorySequence:
-            access.execute(self.pagingAlgorithm)
+        for memAccess in self.memorySequence:
+            self.pagingAlgorithm.access(memAccess.address,memAccess.mode)
+            #self.pagingAlgorithm.displayPageTable()
 
         # Print our summary
         self.pagingAlgorithm.printSummary()
 
-
-
-    def loadTraces(self,traceFile):
-        traceDict = {}
+        # Write our csv so we can print graphs
+        self.pagingAlgorithm.writeCSV("test_results.csv")
 
 
 
@@ -80,7 +76,7 @@ if __name__ == "__main__":
 
     # Add our program arguments
     parser = argparse.ArgumentParser(description='Virtual memory manager for CS1550')
-    parser.add_argument('tracefile', nargs='?', default='empty.txt', type=str,
+    parser.add_argument('tracefile', nargs='?', default='', type=str,
                         help='The path to the tracefile for the memory accesses')
     parser.add_argument('-n', '--numframes', dest='num_frames', action='store',
                         default=10, type=int,
@@ -93,5 +89,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Create and run simulator
-    virtualSim = VirtualSimulator(args.tracefile, args.num_frames, args.algorithm)
+    virtualSim = VirtualSimulator(args.tracefile, int(args.num_frames), args.algorithm)
     virtualSim.run()

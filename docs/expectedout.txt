@@ -1,0 +1,60 @@
+It is up now (for my section at least).
+
+Meanwhile, here are a few expected results to get you going:
+
+==== gcc.trace ====
+Algorithm: LRU
+Number of frames: 2
+Total memory accesses: 515683
+Total page faults: 126391
+Total writes to disk: 43137
+
+Algorithm: OPT
+Number of frames: 2
+Total memory accesses: 515683
+Total page faults: 97148
+Total writes to disk: 31826
+
+Algorithm: SECOND
+Number of frames: 8
+Total memory accesses: 515683
+Total page faults: 23680
+Total writes to disk: 7621
+
+=== gzip.trace ===
+Algorithm: LRU
+Number of frames: 2
+Total memory accesses: 481044
+Total page faults: 40496
+Total writes to disk: 40146
+
+Algorithm: OPT
+Number of frames: 2
+Total memory accesses: 481044
+Total page faults: 40353
+Total writes to disk: 40074
+
+Algorithm: SECOND
+Number of frames: 8
+Total memory accesses: 481044
+Total page faults: 39912
+Total writes to disk: 39866
+
+=== swim ===
+Algorithm: LRU
+Number of frames: 2
+Total memory accesses: 303193
+Total page faults: 67789
+Total writes to disk: 27499
+
+Algorithm: OPT
+Number of frames: 2
+Total memory accesses: 303193
+Total page faults: 57975
+Total writes to disk: 23529
+
+Algorithm: SECOND
+Number of frames: 8
+Total memory accesses: 303193
+Total page faults: 9916
+Total writes to disk: 4892
