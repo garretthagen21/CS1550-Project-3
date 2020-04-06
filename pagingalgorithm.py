@@ -1,3 +1,6 @@
+import csv
+import os
+
 # Page node that will be used in page replacement algorithm
 class PageNode(object):
     def __init__(self, address, refBit = False ,dirtyBit = False, prev=None, next=None):
@@ -99,7 +102,48 @@ class PagingAlgorithm(object):
         print("Total writes to disk: "+str(self.numDiskWrites))
 
     def writeCSV(self,csvFile):
-        pass
+
+        # Figure out our index
+        if self.algoName == "LRU":
+            ourIndex = 1
+        elif self.algoName == "SECOND":
+            ourIndex = 2
+        else:
+            ourIndex = 3
+
+        csvRows = []
+        # Try and load existing csv information
+        if os.path.exists(csvFile):
+            rFile = open(csvFile,'r')
+            reader = csv.reader(rFile)
+            for row in reader:
+                csvRows.append(row)
+            rFile.close()
+        else:
+            csvRows = [["Frames","LRU","SECOND","OPT"]]
+
+
+
+        foundRow = False
+        for row in csvRows:
+            # Transfer other measurements if we already have an entry
+            if row[0] == str(self.numFrames):
+                row[ourIndex] = str(self.numPageFaults)
+                foundRow = True
+
+        # if we need to make a new row
+        if not foundRow:
+            newRow = [str(self.numFrames), "0", "0", "0"]
+            newRow[ourIndex] = str(self.numPageFaults)
+            csvRows.append(newRow)
+
+        wFile = open(csvFile, 'w')
+        csvWriter = csv.writer(wFile)
+        csvWriter.writerows(csvRows)
+        wFile.close()
+
+
+
 
     # Pythonic pure virtual functions
     def access(self, address, mode):
