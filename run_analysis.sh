@@ -17,22 +17,22 @@ fi
 
 # Our parameters
 frame_counts=( 8 16 32 64 )
-algorithms=( lru second opt )
+algorithms=( second lru opt )
 trace_files=( gzip swim gcc mcf twolf )
 
 # Iterate through files
-#for file in "${trace_files[@]}"
-#do
-#	 for algo in "${algorithms[@]}"
-#     do
-#        for count in "${frame_counts[@]}"
-#        do
-#            ./vmsim.py -n $count -a $algo -d 1 -c "$OUTPUT_DIR/$file-basic.csv" $TRACE_DIR/$file.trace
-#        done
-#    done
-#done
+for file in "${trace_files[@]}"
+do
+	 for algo in "${algorithms[@]}"
+     do
+        for count in "${frame_counts[@]}"
+        do
+            ./vmsim.py -n $count -a $algo -d 1 -c "$OUTPUT_DIR/$file-basic.csv" $TRACE_DIR/$file.trace
+        done
+    done
+done
 
-#echo "**************** Done With All Algorithm Analysis **********************"
+echo "**************** Done With All Algorithm Analysis **********************"
 
 
 for file in "${trace_files[@]}"
